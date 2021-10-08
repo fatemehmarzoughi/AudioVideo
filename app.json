@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Audio_Video_Example",
+    "slug": "Audio_Video_Example",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "Audio_Video_Example"
+}
