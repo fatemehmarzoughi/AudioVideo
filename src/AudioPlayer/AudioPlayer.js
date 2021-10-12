@@ -123,11 +123,15 @@ export default class AudioPlayer extends React.Component {
 
     }
 
-    componentWillUnmount() {
+    async componentWillUnmount() {
       this.onPlay.remove();
       this.onPause.remove();
       this.onStop.remove();
-      TrackPlayer.removeUpcomingTracks();
+      this.setState = (state,callback)=>{
+        return;
+      };
+      await TrackPlayer.stop();
+      await TrackPlayer.removeUpcomingTracks();
     }
 
     controlBtnsOpacity = (opacityValue) => {
