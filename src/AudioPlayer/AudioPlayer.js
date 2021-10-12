@@ -249,12 +249,14 @@ export default class AudioPlayer extends React.Component {
               <View style={[styles.cutPicRight1 ]}>
                 <View style={[styles.cutPicRight2 ]}></View>
               </View>
+              <ScrollView>
                 <View style={styles.title}>
                    <Text style={styles.mainTitle}>{this.state.audioName}</Text>
                    <Text style={styles.subTitle}>{this.state.categoryName}</Text>
                 </View>
                 <Text style={styles.youMayAlsopLike}>You may also like</Text>
                 <FlatListStyle1 tracks = {this.context.tracks} />
+              </ScrollView>
             </View>
             )}
             </>
