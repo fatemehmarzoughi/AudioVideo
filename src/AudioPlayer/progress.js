@@ -1,12 +1,11 @@
-import TrackPlayer, { useProgress } from 'react-native-track-player';
+import TrackPlayer, { useProgress, State } from 'react-native-track-player';
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { styles } from './style';
 
 export const MyPlayerBar = () => {
-    const progress = useProgress();
     // let trackIndex = await TrackPlayer.getCurrentTrack();
     // let trackObject = await TrackPlayer.getTrack(trackIndex);
     // const context = useContext(Context)
@@ -15,7 +14,7 @@ export const MyPlayerBar = () => {
     // {
     //     context.changeLoadingStateToFalse();
     // }
-
+    const progress = useProgress()
     return (
             <View style={styles.SliderContainer}>
                 {/* <Text>{progress.buffered}</Text>
@@ -29,23 +28,24 @@ export const MyPlayerBar = () => {
                    maximumTrackTintColor="gray"
                    thumbTintColor="purple"
                    value={progress.position}
-                   step={0.5}
+                   step={0}
                    onValueChange={async (val) => {
                     const state = await TrackPlayer.getState();
+                    console.log(state === State.Playing)
                     if(state === State.Playing)
                     {
-                        TrackPlayer.pause();
-                        TrackPlayer.seekTo(val);
-                        TrackPlayer.play();
+                        await TrackPlayer.pause();
+                        await TrackPlayer.seekTo(val);
+                        await TrackPlayer.play();
                     }
                     else
                     {
-                     TrackPlayer.seekTo(val);
+                     await TrackPlayer.seekTo(val);
                     }
                   }}
                 />
 
             </View>
-        );
+    );
 
 }

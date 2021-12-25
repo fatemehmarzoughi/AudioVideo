@@ -182,9 +182,12 @@ export default class AudioPlayer extends React.Component {
     skipToNext = async () => {
       console.log('skip to next')
       try{
-        console.log('skip to next inside try')
         let state = await TrackPlayer.getState();
-        if(state === 'playing')
+        let conditionInIOS = (state === 'playing') ? true : false;
+        let conditionInAndroid = (state === 3) ? true : false;
+        let condition = isIOS ? conditionInIOS : conditionInAndroid;
+        console.log(condition)
+        if(condition)
         {
           console.log('skip to next inside if')
           TrackPlayer.pause();
@@ -206,7 +209,12 @@ export default class AudioPlayer extends React.Component {
 
     skipToPrevious = async () => {
       try{
-        if(state === 'playing')
+        let state = await TrackPlayer.getState();
+        let conditionInIOS = (state === 'playing') ? true : false;
+        let conditionInAndroid = (state === 3) ? true : false;
+        let condition = isIOS ? conditionInIOS : conditionInAndroid;
+        console.log(State.Playing)
+        if(condition)
         {
           TrackPlayer.pause();
           this.setState({pauseORPlay : 'Play'})
