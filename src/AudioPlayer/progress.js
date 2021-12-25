@@ -1,8 +1,7 @@
 import TrackPlayer, { useProgress } from 'react-native-track-player';
 import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View , Dimensions} from 'react-native';
+import { View } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { styles } from './style';
 

@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, AppState, Image, Dimensions, TouchableOpacity, Animated , FlatList} from 'react-native';
+import { Text, View, Image, TouchableOpacity, Animated, SafeAreaView, Platform } from 'react-native';
 import TrackPlayer, { State } from 'react-native-track-player';
 import { MyPlayerBar } from './progress';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/EvilIcons';
 import FlatListStyle1 from '../FlatLists/FlatListStyle1';
 import { Context } from '../Context/context';
 import { styles } from './style';
+import { isIOS } from '../Constants/Units'
 
 export default class AudioPlayer extends React.Component {
 
@@ -36,15 +37,23 @@ export default class AudioPlayer extends React.Component {
     }
 
     loading = async () => {
-      let state = await TrackPlayer.getState();
-      if(state !== State.None)
-      this.setState({
-        state,
-        loading : false,
-      })
-      else{
-        await this.loading();
-      }
+      try{
+        let state = await TrackPlayer.getState();
+        console.log(state)
+        console.log(State.None)
+        let myState;
+        let iosCondition = (state === State.None) ? true : false;
+        let androidCondition = (state !== State.None.toString()) ? true : false;
+        let condition = isIOS ? iosCondition : androidCondition;
+        if(condition)
+        this.setState({
+          state,
+          loading : false,
+        })
+        else{
+          // await this.loading();
+        }
+      }catch{(err) => console.log(err)}
     }
 
     create_Hours_Minutes_Seconds = (position , duration) => {
@@ -82,6 +91,8 @@ export default class AudioPlayer extends React.Component {
     }
 
     async componentDidMount (){
+      await TrackPlayer.setupPlayer({})
+      await this.loading();
       this.onPlay = TrackPlayer.addEventListener('remote-play', async () => {
         await TrackPlayer.play();
         this.setState({
@@ -100,10 +111,14 @@ export default class AudioPlayer extends React.Component {
 
       try{
         await TrackPlayer.add(this.context.tracks);
-        await TrackPlayer.setupPlayer({})
-
+        console.log(this.context.tracks)
+        
         let trackIndex = await TrackPlayer.getCurrentTrack();
-        let trackObject = await TrackPlayer.getTrack(trackIndex);
+        console.log('trackIndex = ' + trackIndex)
+        let trackObject;
+        if(trackIndex !== null)
+          trackObject = await TrackPlayer.getTrack(trackIndex);
+
         this.setState({
           audioName : trackObject.artist,
           categoryName : trackObject.album,
@@ -135,17 +150,20 @@ export default class AudioPlayer extends React.Component {
     }
 
     controlBtnsOpacity = (opacityValue) => {
-      console.log('opacity func')
+      console.log('opacity func' + opacityValue)
       Animated.timing(this.state.controlBtnsOpacity , {
         toValue : opacityValue,
         duration : 1000,
+        useNativeDriver : true
       }).start()
     }
     
     play_pause = async  () => {
       const state = await TrackPlayer.getState();
-
-      if(state === 'playing')
+      let conditionInIOS = (state === 'playing') ? true : false;
+      let conditionInAndroid = (state === 3) ? true : false;
+      let condition = isIOS ? conditionInIOS : conditionInAndroid;
+      if(condition)
       {
         TrackPlayer.pause();
         this.setState({pauseORPlay : 'Play'})
@@ -209,7 +227,6 @@ export default class AudioPlayer extends React.Component {
 
     render()
     {
-      this.loading()
         return (
           <View style={styles.container}>
             <>
@@ -217,31 +234,38 @@ export default class AudioPlayer extends React.Component {
               <Text>loading = {this.state.loading}</Text>
             ) : (
               <View style={styles.AudioContainer}>
-              <Image style={styles.audioImg} source={require('../images/images.jpeg')} />
-              <Animated.View style={[styles.controlBtnsWithSlider,{opacity : this.state.controlBtnsOpacity}]}>
-                <View onPress={() => this.controlBtnsOpacity(1)} style={[styles.controlBtns]}>
-                 <Icon style={styles.previous} onPress={() => this.skipToPrevious()} name="redo" size={50} color='#333' />
-                 <TouchableOpacity style={styles.play} onPress={() => this.play_pause()}>
-                   <Text style={styles.playTxt}>{this.state.pauseORPlay}</Text>
-                 </TouchableOpacity>
-                 <Icon style={styles.next} onPress={() => this.skipToNext()} name="redo" size={50} color='#333' />
-                </View>
-                <MyPlayerBar />
-                <>
-                {(this.state.endHour == '00') ? (
-                  <View onPress={() => this.controlBtnsOpacity(1)} style={styles.timeContainer}>
-                    <Text>{this.state.endMinutes}:{this.state.endSeconds}</Text>
-                    <Text>{this.state.startMinutes}:{this.state.startSeconds}</Text>
-                  </View>
-                ) : (
-                  <View onPress={() => this.controlBtnsOpacity(1)} style={styles.timeContainer}>
-                     <Text>{this.state.endHour}:{this.state.endMinutes}:{this.state.endSeconds}</Text>
-                     <Text>{this.state.startHour}:{this.state.startMinutes}:{this.state.startSeconds}</Text>
-                  </View>
-                )}
-                </>
-
-              </Animated.View>
+              <Image 
+                 style={[styles.audioImg]} 
+                 source={require('../images/images.jpeg')}
+              />
+              <TouchableOpacity 
+                  style={styles.controlBtnsWithSlider2} 
+                  onPress={() => this.controlBtnsOpacity(1) } 
+              >
+                  <Animated.View style={[styles.controlBtnsWithSlider,{opacity : this.state.controlBtnsOpacity}]}>
+                    <View onPress={() => this.controlBtnsOpacity(1)} style={[styles.controlBtns]}>
+                     <Icon style={styles.previous} onPress={() => this.skipToPrevious()} name="redo" size={50} color='#333' />
+                     <TouchableOpacity style={styles.play} onPress={() => this.play_pause()}>
+                       <Text style={styles.playTxt}>{this.state.pauseORPlay}</Text>
+                     </TouchableOpacity>
+                     <Icon style={styles.next} onPress={() => this.skipToNext()} name="redo" size={50} color='#333' />
+                    </View>
+                    <MyPlayerBar />
+                    <>
+                    {(this.state.endHour == '00') ? (
+                      <View onPress={() => this.controlBtnsOpacity(1)} style={styles.timeContainer}>
+                        <Text>{this.state.endMinutes}:{this.state.endSeconds}</Text>
+                        <Text>{this.state.startMinutes}:{this.state.startSeconds}</Text>
+                      </View>
+                    ) : (
+                      <View onPress={() => this.controlBtnsOpacity(1)} style={styles.timeContainer}>
+                         <Text>{this.state.endHour}:{this.state.endMinutes}:{this.state.endSeconds}</Text>
+                         <Text>{this.state.startHour}:{this.state.startMinutes}:{this.state.startSeconds}</Text>
+                      </View>
+                    )}
+                    </>
+                  </Animated.View>
+              </TouchableOpacity>
               <View style={styles.cutPicLeft1}>
                 <View style={styles.cutPicLeft2}></View>
               </View>
@@ -249,14 +273,14 @@ export default class AudioPlayer extends React.Component {
               <View style={[styles.cutPicRight1 ]}>
                 <View style={[styles.cutPicRight2 ]}></View>
               </View>
-              <ScrollView>
+              <SafeAreaView>
                 <View style={styles.title}>
                    <Text style={styles.mainTitle}>{this.state.audioName}</Text>
                    <Text style={styles.subTitle}>{this.state.categoryName}</Text>
                 </View>
-                <Text style={styles.youMayAlsopLike}>You may also like</Text>
+                <Text style={styles.youMayAlsopLike} >You may also like</Text>
                 <FlatListStyle1 tracks = {this.context.tracks} />
-              </ScrollView>
+              </SafeAreaView>
             </View>
             )}
             </>

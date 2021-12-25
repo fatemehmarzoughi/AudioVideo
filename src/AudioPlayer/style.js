@@ -40,6 +40,16 @@ export const styles = StyleSheet.create({
         flexDirection : 'column-reverse',
         paddingBottom : 80,
       },
+      controlBtnsWithSlider2 : {
+        position : 'absolute',
+        width : windowWidth,
+        height : 350,
+        display : 'flex',
+        alignItems : 'center',
+        justifyContent : 'space-between',
+        flexDirection : 'column-reverse',
+        paddingBottom : 80,
+      },
       AudioContainer : {
     
       },
